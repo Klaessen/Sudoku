@@ -127,6 +127,44 @@ int solve(int (*sudoku)[9], int x, int y)
     return 1;
 }
 
+void saveSudoku(int (*sudoku)[9])
+{
+    // open file
+    FILE *file = fopen("sudoku.txt", "w");
+
+    // write sudoku to file
+    for (int x = 0; x < 9; x++)
+    {
+        for (int y = 0; y < 9; y++)
+        {
+            fprintf(file, "%d", sudoku[x][y]);
+            fprintf(file, " ");
+        }
+        fprintf(file, "\n");
+    }
+
+    // close file
+    fclose(file);
+}
+
+void loadSudoku(int (*sudoku)[9])
+{
+    // open file
+    FILE *file = fopen("sudoku.txt", "r");
+
+    // read sudoku from file
+    for (int x = 0; x < 9; x++)
+    {
+        for (int y = 0; y < 9; y++)
+        {
+            fscanf(file, "%d", &sudoku[x][y]);
+        }
+    }
+
+    // close file
+    fclose(file);
+}
+
 int main(int argc, char *argv[])
 {
     // initialize sudoku
@@ -168,4 +206,30 @@ int main(int argc, char *argv[])
         }
         printf("\n");
     }
+
+    saveSudoku(sudoku);
+
+    //reset
+    printf("\nResetting the Sudoku\n");
+    for (int rows = 0; rows < 9; rows++)
+    {
+        for (int columns = 0; columns < 9; columns++)
+        {
+            sudoku[rows][columns] = 0;
+        }
+    }
+
+    loadSudoku(sudoku);
+
+    // loaded sudoku
+    printf("\nDisplaying the loaded Sudoku\n");
+    for (int rows = 0; rows < 9; rows++)
+    {
+        for (int columns = 0; columns < 9; columns++)
+        {
+            printf("%d  ", sudoku[rows][columns]);
+        }
+        printf("\n");
+    }
+
 }
