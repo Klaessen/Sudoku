@@ -101,7 +101,7 @@ int solve(int (*sudoku)[9], int x, int y)
                     // if number is available in row, column and square set it
                     if (checkRow(sudoku, x, number) && checkColumn(sudoku, y, number) && checkSquare(sudoku, x, y, number))
                     {
-                        // set number
+                        // set field to number
                         sudoku[x][y] = number;
 
                         // if next field can be filled, return 1
@@ -137,8 +137,7 @@ void saveSudoku(int (*sudoku)[9])
     {
         for (int y = 0; y < 9; y++)
         {
-            fprintf(file, "%d", sudoku[x][y]);
-            fprintf(file, " ");
+            fprintf(file, "%d ", sudoku[x][y]);
         }
         fprintf(file, "\n");
     }
@@ -164,6 +163,30 @@ void loadSudoku(int (*sudoku)[9])
     // close file
     fclose(file);
 }
+
+void generatePuzzle(int (*sudoku)[9], int difficulty) {
+
+    // initialize random number generator
+    srand(time(NULL));
+
+    //counter for number of empty fields
+    int i = 0;
+
+    //set random fields to 0
+    while (i < difficulty)
+    {
+        int x = rand() % 9;
+        int y = rand() % 9;
+
+        if (sudoku[x][y] != 0)
+        {
+            sudoku[x][y] = 0;
+            i++;
+        }  
+    }
+
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -223,6 +246,19 @@ int main(int argc, char *argv[])
 
     // loaded sudoku
     printf("\nDisplaying the loaded Sudoku\n");
+    for (int rows = 0; rows < 9; rows++)
+    {
+        for (int columns = 0; columns < 9; columns++)
+        {
+            printf("%d  ", sudoku[rows][columns]);
+        }
+        printf("\n");
+    }
+
+    generatePuzzle(sudoku, 5);
+
+    // preview puzzle
+    printf("\nDisplaying the Puzzle\n");
     for (int rows = 0; rows < 9; rows++)
     {
         for (int columns = 0; columns < 9; columns++)
