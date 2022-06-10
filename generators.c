@@ -187,6 +187,66 @@ void generatePuzzle(int (*sudoku)[9], int difficulty) {
 
 }
 
+void giveHint(int (*sudoku)[9], int hint [3])
+{
+ for (int x = 0; x < 9; x++)
+    {
+        // columns
+        for (int y = 0; y < 9; y++)
+        {
+            // next empty field
+            if (sudoku[x][y] == 0)
+            {
+                // numbers 1-9
+                for (int number = 1; number < 10; number++)
+                {
+                    // if number is available in row, column and square set it
+                    if (checkRow(sudoku, x, number) && checkColumn(sudoku, y, number) && checkSquare(sudoku, x, y, number))
+                    {
+                        // set field to number
+                        sudoku[x][y] = number;
+
+                        // if next field can be filled, return number and position
+                        if (solve(sudoku, x, y + 1) == 1)
+                        {   
+                            sudoku[x][y] = 0;
+                            hint[0] = number;
+                            hint[1] = x;
+                            hint[2] = y;
+                            break;
+                        }
+                        else
+                        {
+                            // if next field can't be filled give the player a hint to delete a number
+                            hint[0] = 0;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+int getSudokuStatus(int (*sudoku)[9])
+{
+    // check if sudoku is solved
+    for (int x = 0; x < 9; x++)
+    {
+        // columns
+        for (int y = 0; y < 9; y++)
+        {
+            if (sudoku[x][y] == 0)
+            {
+                printf("Sudoku is not solved!\n");
+                return 0;
+            }
+        }
+    }
+    printf("Sudoku is solved!\n");
+    return 1;
+}
+
 
 int main(int argc, char *argv[])
 {
@@ -202,11 +262,19 @@ int main(int argc, char *argv[])
         {0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0}};
 
+    //helper array for hints
+    int hint[3] = {0, 0, 0};
+
+    //state of sudoku
+    int status = 0;
+
+    //numbers of empty fields
+    int difficulty = 5;
+
     // seed sudoku
     seed(sudoku);
 
-    // preview seed
-    printf("Preview of Sudoku seed\n");
+    printf("\nPreview of Sudoku seed\n");
     for (int rows = 0; rows < 9; rows++)
     {
         for (int columns = 0; columns < 9; columns++)
@@ -219,7 +287,6 @@ int main(int argc, char *argv[])
     // commit sudoku
     solve(sudoku, 0, 0);
 
-    // solved sudoku
     printf("\nDisplaying the solved Sudoku\n");
     for (int rows = 0; rows < 9; rows++)
     {
@@ -230,6 +297,7 @@ int main(int argc, char *argv[])
         printf("\n");
     }
 
+    // save sudoku to file
     saveSudoku(sudoku);
 
     //reset
@@ -242,9 +310,9 @@ int main(int argc, char *argv[])
         }
     }
 
+    //load sudoku from file
     loadSudoku(sudoku);
 
-    // loaded sudoku
     printf("\nDisplaying the loaded Sudoku\n");
     for (int rows = 0; rows < 9; rows++)
     {
@@ -255,9 +323,9 @@ int main(int argc, char *argv[])
         printf("\n");
     }
 
-    generatePuzzle(sudoku, 5);
+    // generate puzzle from solved sudoku
+    generatePuzzle(sudoku, difficulty);
 
-    // preview puzzle
     printf("\nDisplaying the Puzzle\n");
     for (int rows = 0; rows < 9; rows++)
     {
@@ -268,4 +336,20 @@ int main(int argc, char *argv[])
         printf("\n");
     }
 
+    // give hint for next field
+    giveHint(sudoku, hint);
+
+    printf("\nDisplaying Hint\n");
+    for (int x = 0; x < 3; x++)
+    {
+        printf("%d  ", hint[x]);
+    }
+    printf("\n");
+
+    status = getSudokuStatus(sudoku);
+
+    printf("\nSolving the Sudoku...\n");
+    solve(sudoku, 0, 0);
+
+    status = getSudokuStatus(sudoku);
 }
